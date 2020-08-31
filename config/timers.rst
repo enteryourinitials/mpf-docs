@@ -11,12 +11,6 @@ timers:
 
 .. overview
 
-+------------------------------------------------------------------------------+
-| Related Tutorial                                                             |
-+==============================================================================+
-| :doc:`/game_logic/timers/index`                                              |
-+------------------------------------------------------------------------------+
-
 The ``timers:`` section of your config is where configure
 :doc:`timers </game_logic/timers/index>` that can "tick" up or down.
 Timers post events with each tick which you can use to update slides, etc. You can set the
@@ -99,6 +93,9 @@ once a second. That tick event is used to rotate the lit skillshot.
 
 See :doc:`timer_control_events` for more details about all the actions available in a timer.
 
+.. config
+
+
 Optional settings
 -----------------
 
@@ -106,38 +103,26 @@ The following sections are optional in the ``timers:`` section of your config. (
 
 bcp:
 ~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
 
 Controls whether the various timer events (count, start, stop, complete, etc.) are sent to the MPF-MC via BCP.
 
-console_log:
-~~~~~~~~~~~~
-Single value, type: one of the following options: none, basic, full. Default: ``none``
-
-Log level for the console log for this device.
-
 control_events:
 ~~~~~~~~~~~~~~~
-List of one (or more) values, each is a type: :doc:`timer_control_events <timer_control_events>`.
+List of one (or more) values, each is a type: :doc:`timer_control_events <timer_control_events>`. Defaults to empty.
 
 Timer control events is where you specify what happens to this timer when other events are posted.
 See :doc:`timer_control_events` for more details.
 
-debug:
-~~~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
-
-If true/yes, adds additional logging information to the verbose log for this timer.
-
 direction:
 ~~~~~~~~~~
-Single value, type: ``string``. Default: ``up``
+Single value, type: one of the following options: up, down. Default: ``up``
 
 Controls which direction this timer runs in. Options are ``up`` or ``down``.
 
 end_value:
 ~~~~~~~~~~
-Single value, type: ``integer`` or ``template`` (:doc:`Instructions for entering templates </config/instructions/dynamic_values>`).
+Single value, type: ``integer`` or ``template`` (:doc:`Instructions for entering templates </config/instructions/dynamic_values>`). Defaults to empty.
 
 Specifies what the final value for this timer will be. When the timer value equals or exceeds this (for timers counting
 up), or when it equals or is lower than this (for timers counting down), the *timer_<name>_complete* event is
@@ -147,29 +132,23 @@ back to its ``start_value:`` and started again.)
 Note that you can use a :doc:`dynamic value </config/instructions/dynamic_values>`
 for this setting.
 
-file_log:
-~~~~~~~~~
-Single value, type: one of the following options: none, basic, full. Default: ``basic``
-
-Log level for the file log for this device.
-
 max_value:
 ~~~~~~~~~~
-Single value, type: ``integer``.
+Single value, type: ``integer``. Defaults to empty.
 
 The maximum value this timer can be. If you try to add value above this, the timer's value will be reset
 to this value.
 
 restart_on_complete:
 ~~~~~~~~~~~~~~~~~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
 
 Controls what should happen when this timer completes. If you have ``restart_on_complete: true``, then
 this timer will reset back to the start_value and start again after it completes.
 
 start_running:
 ~~~~~~~~~~~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
 
 Controls whether this timer starts running ("started"), or whether it needs to be started with one of the
 start control events.
@@ -199,3 +178,39 @@ really short if you want a hurry up, maybe every 100ms removed 77,000 worth of p
    :hidden:
 
    timer_control_events: <timer_control_events>
+
+console_log:
+~~~~~~~~~~~~
+Single value, type: one of the following options: none, basic, full. Default: ``basic``
+
+Log level for the console log for this device.
+
+debug:
+~~~~~~
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
+
+If true/yes, adds additional logging information to the verbose log for this timer.
+
+file_log:
+~~~~~~~~~
+Single value, type: one of the following options: none, basic, full. Default: ``basic``
+
+Log level for the file log for this device.
+
+label:
+~~~~~~
+Single value, type: ``string``. Default: ``%``
+
+Name of this device in service mode.
+
+tags:
+~~~~~
+List of one (or more) values, each is a type: ``string``. Defaults to empty.
+
+Not used.
+
+
+Related How To guides
+---------------------
+
+* :doc:`/game_logic/timers/index`

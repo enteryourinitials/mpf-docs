@@ -51,7 +51,7 @@ That means that at about 1.7V current will start to flow through the diode
 and it will emit (IR) light.
 Unfortunately, just connecting it to 1.7V is not sufficient because the current
 is non-linear for LEDs.
-Below the forward voltage (i.e. 1.7V) is 0 and above the forward voltage it
+Below the forward voltage (i.e. 1.7V) the currency is 0 and above the forward voltage it
 increases exponentially.
 According to the specifications most IR LEDs should use run at 20mA.
 However, in pinball machines 50-70mA is used because it allows larger distances.
@@ -107,7 +107,7 @@ standard 1/2watt resistor).
 
 Common parts:
 
-* 4x Opto board - PBL-600-0256-00
+* 4x Opto board - #600-0256-00
 
 
 Common Parts in Pinball Machines
@@ -182,9 +182,9 @@ Multimorphic produces and sells optos with a JST connector.
 The transmitter contains a current limiting resistor for 12V (you only have to
 connect one of the 12V and GND pins). You don't need an additional resistor
 but you are also bound to 12V. They might work at 5V but the range will be much
-lower. Though the surface mount resistor on the transmitter board is designed to run 
-"hot," it still requires a surrounding air gap to dissipate heat. 3D printed parts 
-mounted against this resistor will melt. 
+lower. Though the surface mount resistor on the transmitter board is designed to run
+"hot," it still requires a surrounding air gap to dissipate heat. 3D printed parts
+mounted against this resistor will melt.
 
 Part numbers:
 

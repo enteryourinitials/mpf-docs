@@ -7,7 +7,7 @@ It contains CPU and drivers so it can also be used to build full custom
 machines.
 Uses the :doc:`LISY protocol </hardware/lisy/protocol>`.
 
-
+This is how APC generally works: https://www.youtube.com/watch?v=w4Po8OE5Zkw
 
 See `Arduino Pinball Controller Documentation <https://github.com/AmokSolderer/APC>`_
 on github for details.
@@ -43,6 +43,11 @@ This is an example config:
    hardware_sound_systems:
      default:
        label: APC
+
+
+See the :doc:`LISY platform </hardware/lisy/index>` for more details on
+configuring hardware.
+
 
 .. toctree::
    :titlesonly:

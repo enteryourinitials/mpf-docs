@@ -80,6 +80,69 @@ also include support for automatic enabling and disabling (based on
 events), and they include intelligence to know which target devices a
 diverter will send a ball to when it's enabled or disabled.
 
+
+Understanding the difference between "enabling" and "activating" diverters
+--------------------------------------------------------------------------
+
+When talking about diverters in MPF, we use the terms *activate* and
+*enable* (as well as *deactivate* and *disable*). Even though these
+words sound like they're the same thing, they're actually different,
+so it's important to understand them.
+
+When a diverter is *active*, that
+means it's physically activated in its active position. A diverter
+that is *enabled* means that it's ready to be activated, but it's not
+necessarily active at this time. To understand this, let's step
+through an example.
+
+Imagine a typical ramp in a pinball machine which
+has one entrance and two exits. These kinds of ramps usually have a
+diverter at the top of them that can send the ball down one of the two
+paths. When the diverter is *inactive* (its default state), the ball
+goes down one path, and when the diverter is *active*, the ball is
+sent down the other path (perhaps towards a ball lock).
+
+There is
+typically an entrance switch on the ramp which lets the game know that
+a ball is potentially headed towards that diverter, so when the game
+wants to route the ball to the "other" ramp exit, rather than turning
+on that diverter and holding it on forever, the game just watches for
+that ramp entry switch and then quickly fires the diverter to route
+the ball to the other exit. Then once the ball passes by the diverter,
+it hits a second switch which turns off the diverter. (Typically the
+diverter activation also has a timeout which is used when a weak shot
+is made where the ball trips the ramp entrance switch but doesn't
+actually make it all the way up the ramp to the diverter.)
+
+So in MPF
+parlance, we say that the diverter is *enabled* whenever it's ready to
+be fired, but it's not actually *active* until the coil is physically
+on.
+
+Again using our example, let's say we have a ramp with a diverter,
+and when that diverter is *active* it sends a ball into a lock. When
+the game starts, the diverter is *disabled* and *inactive*. Ramp shots
+just go up the ramp and come out the default path, and the diverter
+ignores the ramp entrance switch.
+
+Then when the player does whatever
+they need to do to light the lock, the diverter is *enabled*. At this
+point the diverter is *not* active since it's not actually firing, but
+it's *enabled* (which means it's ready to fire) and the diverter is
+watching that ramp entrance switch. (So the diverter is *enabled* but
+*inactive*.) Then when the player shoots the ball up that ramp, the
+diverter sees the ramp entrance switch hit and the diverter activates.
+(So now the diverter is *enabled* and *active*.)
+
+Then once the ball
+passes by the diverter, the diverter deactivates. At this point
+whether the diverter is disabled or enabled depends on the game logic.
+If the lock should stay lit, then the diverter remains enabled even
+though it's not *active*, and if the player has to do something else
+to re-light the lock, then the diverter is *disabled* and *inactive*.
+
+Hopefully that makes sense? :)
+
 Monitorable Properties
 ----------------------
 
@@ -102,70 +165,7 @@ the prefix for diverters is ``device.diverters.<name>``.
 Related How To guides
 ---------------------
 
-Dual Coil Diverter Example:
-   In this example we use a standard flipper mechanism with a dual wound coil as a diverter. Much like a flipper, we'll want to control the main coil for enabling the diverter, and then the hold coil to hold it in the active position for as long as you need. 
-   
-First we need to define the coils in our hardware section: 
-
-.. code-block:: mpf-config
-
-    coils:
-      c_diverter_upper_right_main:
-        number: 25
-        default_pulse_ms: 4
-        default_hold_power: 0.2
-      c_diverter_upper_right_hold:
-        number: 26
-        allow_enable: true
-
-        
-Next we'll define the dual wound coil for the diverter to use:
-
-.. code-block:: mpf-config
-
-    #! coils:
-    #!   c_diverter_upper_right_main:
-    #!     number: 25
-    #!     default_pulse_ms: 4
-    #!     default_hold_power: 0.2
-    #!   c_diverter_upper_right_hold:
-    #!     number: 26
-    #!     allow_enable: true
-    dual_wound_coils:
-      c_diverter_dualcoil:
-        hold_coil: c_diverter_upper_right_hold
-        main_coil: c_diverter_upper_right_main
-
-Then we define the Diverter itself:
-
-.. code-block:: mpf-config
-
-    #! coils:
-    #!   c_diverter_upper_right_main:
-    #!     number: 25
-    #!     default_pulse_ms: 4
-    #!     default_hold_power: 0.2
-    #!   c_diverter_upper_right_hold:
-    #!     number: 26
-    #!     allow_enable: true
-    #! switches:
-    #!   s_r_rampexit:
-    #!     number:
-    #!   s_l_rampexit:
-    #!     number:
-    #! dual_wound_coils:
-    #!   c_diverter_dualcoil:
-    #!     hold_coil: c_diverter_upper_right_hold
-    #!     main_coil: c_diverter_upper_right_main
-    diverters:
-      ramp_diverter:
-        activation_coil: c_diverter_dualcoil
-        type: hold
-        activation_time: .5s
-        activation_switches: s_r_rampexit, s_l_rampexit
-        enable_events: ball_started
-        disable_events: ball_ended
-        
+ * :doc:`dual_coil_diverter`
  * :doc:`up_down_ramps`
 
 Related Events
@@ -179,3 +179,4 @@ Related Events
    up_down_ramps
    servo_as_diverter
    stepper_as_diverter
+   dual_coil_diverter

@@ -189,9 +189,9 @@ there are three standard MPF events which are posted when slides are created,
 when they become active, and when they're removed. See the events reference
 for details on when these three events are posted.
 
-* :doc:`slide_(slide_name)_created </events/slide_name_created>`
-* :doc:`slide_(slide_name)_active </events/slide_name_active>`
-* :doc:`slide_(slide_name)_removed </events/slide_name_removed>`
+* :doc:`slide_(slide_name)_created </events/slide_slide_created>`
+* :doc:`slide_(slide_name)_active </events/slide_slide_active>`
+* :doc:`slide_(slide_name)_removed </events/slide_slide_removed>`
 
 4. Animating multiple properties at once
 ----------------------------------------
@@ -361,6 +361,43 @@ section and you added it via a ``widget_player:`` entry), the widget will fly in
 initial y value is -50, it will start off the screen). Then when the ``pulse_boo`` event is posted, the two-step
 animation which makes the font size bigger and smaller will starting playing and repeat forever. Finally when ``bye_boo``
 is posted, the widget will fly off the screen to the upper right.
+
+There is something special to consider when working with 360 degree rotations.
+Setting the property rotation to 360 results in a complete turn of a widget.
+However, attempting to repeat the 360 degree rotation appears to do nothing.
+This is because of how Kivi handles 0 and 360 degrees.
+When the rotation completes, the widget is at rotation 360 degrees.
+Repeating the step fails to cause the widget to move because it is already at destination.
+To create continuously rotating widgets, a two step process is required:
+
+.. code-block:: mpf-mc-config
+
+   slides:
+     slide1:
+       widgets:
+         - type: text
+           text: I'M GOING TO ROTATE
+           x: 50
+           y: 50
+           animations:
+             show_slide:
+               - property: rotation
+                 value: 0
+                 relative: false
+                 duration: 0
+               - property: rotation
+                 value: 360
+                 relative: false
+                 duration: 2s
+                 repeat: true
+
+   #! slide_player:
+   #!   show_slide: slide1
+   ##! test
+   #! post show_slide
+
+The first step creates a reset point setting the widget at 0 degrees. This assures that there is always a destination
+to rotate to which is provided by the following step.
 
 7. Inserting a "pause"
 ----------------------

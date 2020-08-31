@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # sphinx-doc config file
-
 import time
 import os
-import re
 import sys
 import tempfile
 import git
@@ -18,12 +16,12 @@ sys.setrecursionlimit(2000)
 
 sys.path.append(os.getcwd())
 from _doc_tools.mpf_lexer import MpfLexer, ExampleSliderVisitor
-from _doc_tools.build_events_reference_docs import EventDocParser
 from _doc_tools.build_examples import ExampleBuilder
 from _doc_tools.mpf_config_test import CodeBlockVisitor, ConfigSnippetTester
 
 extensions = ['sphinx.ext.todo',
-              'sphinx.ext.ifconfig']
+              'sphinx.ext.ifconfig',
+              'notfound.extension']
 
 source_suffix = '.rst'
 
@@ -204,9 +202,9 @@ def annotate_html(app, doctree, fromdocname):
 
 
 def setup(app):
-    app.add_stylesheet('mpf.css')
+    app.add_css_file('mpf.css')
     app.add_config_value('use_mc', False, False, [bool])
-    app.add_javascript('mpf.js')
+    app.add_js_file('mpf.js')
 
     app.connect('doctree-resolved', process_source)
     app.connect('doctree-resolved', annotate_html)
@@ -265,33 +263,9 @@ def setup_tests_link(link_name, repo_name, package_name):
     os.symlink(tests_root, link_name)
 
 def build_event_references():
-    a = EventDocParser(os.path.join(os.getcwd(), "events"))
-    paths = [get_repo_path("mpf"), get_repo_path("mpf-mc")]
-
-    # walk through the folders to scan
-    for path in paths:
-        for root, _, files in os.walk(path):
-            for file in [x for x in files if x.endswith('.py')]:
-                a.parse_file(os.path.join(root, file))
-
-    # create the index.rst based on everything that was found
-    a.write_index()
-
-def verify_version(version_file):
-
-    #  http://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
-    verstrline = open(version_file, "rt").read()
-    VSRE = r"^__short_version__ = ['\"]([^'\"]*)['\"]"
-    mo = re.search(VSRE, verstrline, re.M)
-    if mo:
-        mpf_version_required_string = mo.group(1)
-    else:
-        raise RuntimeError("Unable to find version string in %s." % (version_file,))
-
-    if mpf_version_required_string != mpf._version.__short_version__:
-        raise RuntimeError("mpf-examples version mismatch. MPF is version {} "
-                           "but the mpf-examples repo found requires MPF {}".format(
-            mpf._version.__short_version__, mpf_version_required_string))
+    sys.path.append(get_repo_path("mpf"))
+    from _doc_tools.build_events_reference_docs import run
+    run(os.path.join(os.getcwd(), "events"), get_repo_path("mpf"), get_repo_path("mpf-mc"))
 
 setup_tests_link(mpf_examples, 'mpf', 'mpf')
 setup_tests_link(mpfmc_examples, 'mpf-mc', 'mpfmc')

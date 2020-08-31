@@ -11,12 +11,6 @@ counters:
 
 .. overview
 
-+------------------------------------------------------------------------------+
-| Related Tutorial                                                             |
-+==============================================================================+
-| :doc:`/game_logic/logic_blocks/integrating_logic_blocks_and_shows`           |
-+------------------------------------------------------------------------------+
-
 The ``counters:`` section of your config is where you configure counter logic blocks.
 See also :doc:`counters </game_logic/logic_blocks/counters>`.
 The structure of counter logic blocks is like this:
@@ -51,6 +45,9 @@ the old behaviour:
          int: value
          action: set
 
+.. config
+
+
 Required settings
 -----------------
 
@@ -58,7 +55,7 @@ The following sections are required in the ``counters:`` section of your config:
 
 count_events:
 ~~~~~~~~~~~~~
-List of one (or more) device control events (:doc:`Instructions for entering device control events </config/instructions/device_control_events>`).
+List of one (or more) device control events (:doc:`Instructions for entering device control events </config/instructions/device_control_events>`). Defaults to empty.
 
 This is an event (or a :doc:`list of events </config/instructions/lists>`) that, when posted, will
 increment or decrement the count for this Counter.
@@ -76,19 +73,33 @@ Optional settings
 
 The following sections are optional in the ``counters:`` section of your config. (If you don't include them, the default will be used).
 
+control_events:
+~~~~~~~~~~~~~~~
+List of one (or more) values, each is a type: :doc:`counter_control_events <counter_control_events>`. Defaults to empty.
+
+Control events to change the value of this counter.
+MPF currently supports adding/substracting from the count or jumping to a
+certain value.
+
+For instance in the following example ``add_five_event`` will add ``5`` to
+the counter:
+
+.. code-block:: mpf-config
+
+   counters:
+     counter_with_control_events:
+       count_events: count_up
+       control_events:
+         - event: add_five_event
+           action: add
+           value: 5
+
 count_complete_value:
 ~~~~~~~~~~~~~~~~~~~~~
-Single value, type: template_int.
+Single value, type: ``integer`` or ``template`` (:doc:`Instructions for entering templates </config/instructions/dynamic_values>`). Defaults to empty.
 
 When the Counter exceeds (or gets below if you're counting down) this
 value, it will post its "complete" event and be considered complete.
-
-Default is ``None``.
-
-Note that you can use a :doc:`dynamic value </config/instructions/dynamic_values>`
-for this setting.
-
-.. include:: template_setting.rst
 
 count_interval:
 ~~~~~~~~~~~~~~~
@@ -115,7 +126,7 @@ Default is ``up``.
 
 multiple_hit_window:
 ~~~~~~~~~~~~~~~~~~~~
-Single value, type: ``time string (ms)`` (:doc:`Instructions for entering time strings </config/instructions/time_strings>`) . Default: ``0``
+Single value, type: ``time string (ms)`` (:doc:`Instructions for entering time strings </config/instructions/time_strings>`). Default: ``0``
 
 This is an :doc:`MPF time value string </config/instructions/time_strings>`
 that will be used to group
@@ -134,7 +145,7 @@ Default is ``0`` (which means all hits are counted).
 
 starting_count:
 ~~~~~~~~~~~~~~~
-Single value, type: template_int. Default: ``0``
+Single value, type: ``integer`` or ``template`` (:doc:`Instructions for entering templates </config/instructions/dynamic_values>`). Default: ``0``
 
 This is the starting value of the Counter and the value it goes back
 to when it's reset. Default is zero. If you're configuring a counter
@@ -154,7 +165,7 @@ Log level for the console log for this device.
 
 debug:
 ~~~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
 
 Set this to true to see additional debug output. This might impact the performance of MPF.
 
@@ -172,10 +183,15 @@ Name of this device in service mode.
 
 tags:
 ~~~~~
-List of one (or more) values, each is a type: ``string``.
+List of one (or more) values, each is a type: ``string``. Defaults to empty.
 
 Currently unused.
 
-.. include:: /game_logic/logic_blocks/common.rst
+.. include:: /config/logic_blocks_common.rst
 
 
+Related How To guides
+---------------------
+
+* :doc:`/game_logic/logic_blocks/counters`
+* :doc:`/game_logic/logic_blocks/integrating_logic_blocks_and_shows`

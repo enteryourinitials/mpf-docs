@@ -100,7 +100,7 @@ You may also use outputs as ``digital_outputs``. For instance, to control a moto
    circuits (not directly).
 
 Pulse time
-~~~~~~~~~~
+^^^^^^^^^^
 
 The P-Roc, P3-Roc and/or PD-16 have the ability to specify the "pulse time".
 Pulse time is the coil's initial kick time.
@@ -116,7 +116,7 @@ For example, consider the following configuration:
 When MPF sends this coil a pulse command, the coil will be fired for 30ms.
 
 Pulse Power
-~~~~~~~~~~~
+^^^^^^^^^^^
 
 You can also set the power of pulses on your coil:
 
@@ -129,11 +129,11 @@ You can also set the power of pulses on your coil:
         default_pulse_power: 0.5
 
 See the hold power section below for internal details about PWM times.
-With the P-Roc it is not possible to use ``default_hold_power`` and
+With the P-Roc and P3-Roc it is not possible to use ``default_hold_power`` and
 ``default_pulse_power`` at the same time.
 
 Hold Power
-~~~~~~~~~~
+^^^^^^^^^^
 
 If you want to hold a driver on at less than full power, MPF does this by using
 ``default_hold_power`` parameter which works for all platforms.
@@ -160,12 +160,14 @@ With the P-Roc it is not possible to use ``default_hold_power`` and
 
 
 Recycle
-~~~~~~~
+^^^^^^^
 
 You can set :doc:`recycle time </mechs/coils/recycle>`
 to your coil to prevent it from overheating by repeated pulses.
 The recycle time is not configurable on the P-Roc but you can turn it on or
 off (default on).
+Default recycle time (called reload in the P/P3-Roc) is ``64ms``.
+
 This is an example:
 
 .. code-block:: mpf-config
@@ -180,3 +182,10 @@ This is an example:
         default_pulse_ms: 32
         default_recycle: false
 
+What if it did not work?
+------------------------
+
+Have a look at our
+:doc:`troubleshooting guide for the P/P3-Roc <troubleshooting>`.
+
+.. include:: ../driver_related_howto_guides.rst

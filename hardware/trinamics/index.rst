@@ -13,6 +13,8 @@ Trinamic's StepRocker
 
 Connect the StepRocker to USB and MPF can control any steppers connected to it.
 
+:doc:`TODO: Add a picture of a StepRocker </about/help_us_to_write_it>`
+
 This is an example:
 
 .. code-block:: mpf-config
@@ -45,3 +47,7 @@ This is an example:
          velocity_limit: 0.5                   # user units/sec   (so, 0.8 RPS of output gear )
          acceleration_limit: 2.0               # user units/sec^2  (so, 2 RPS^S of output gear)
 
+What if it did not work?
+------------------------
+
+Have a look at our :doc:`hardware troubleshooting guide </hardware/troubleshooting_hardware>`.

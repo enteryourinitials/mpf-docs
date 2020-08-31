@@ -1,14 +1,19 @@
 import os
+from collections import namedtuple
+
 import re
 import sys
 
-from mpf._version import __version__
 import mpf
 
 import ruamel.yaml as yaml
 from mpf.core.utility_functions import Util
+from typing import Dict, Tuple
 
 rst_path = '../config'
+
+
+RstSection = namedtuple("RstSection", ["header", "body", "full_body", "level", "parent"])
 
 
 class ConfigDocParser(object):
@@ -88,6 +93,8 @@ your machine-wide config, a mode-specific config, or both.
 
             if setting_name == '__valid_in__':
                 final_dict['valid_in'] = setting_spec
+            if setting_name == '__type__':
+                final_dict['__type__'] = setting_spec
 
             if isinstance(setting_spec, dict):
 
@@ -95,17 +102,19 @@ your machine-wide config, a mode-specific config, or both.
                     self._create_subsection_config_spec(setting_spec))
 
             elif isinstance(setting_spec, str):
+                if setting_spec == "ignore":
+                    final_dict['optional'].append((setting_name, "ignored", "ignored", "None"))
+                else:
+                    try:
+                        num, stype, default = setting_spec.split('|')
 
-                try:
-                    num, stype, default = setting_spec.split('|')
-
-                    if default:
-                        final_dict['optional'].append((setting_name, num,
-                                                       stype, default))
-                    else:
-                        final_dict['required'].append((setting_name, num, stype))
-                except ValueError:
-                    final_dict['ignored'].append((setting_name, setting_spec))
+                        if default:
+                            final_dict['optional'].append((setting_name, num,
+                                                           stype, default))
+                        else:
+                            final_dict['required'].append((setting_name, num, stype))
+                    except ValueError:
+                        final_dict['ignored'].append((setting_name, setting_spec))
 
             elif setting_name == '__allow_others__':
                 final_dict['allow_others'] = True
@@ -116,9 +125,19 @@ your machine-wide config, a mode-specific config, or both.
 
         return final_dict
 
-    def create_rsts(self):
+    def create_rsts(self, dangerous_changes):
         for k, v in self.config_specs.items():
-            self._create_rst(k, v)
+            # skip config players for now as they cause havoc
+            if v.get("type", None) == "config_player":
+                continue
+            if not v["required"] and not v["optional"]:
+                # no specs at all
+                continue
+
+            try:
+                self.create_rst(k, dangerous_changes)
+            except AssertionError as e:
+                print("FAILED TO UPDATE {}. Skipping. ({})".format(k, e))
 
     def _prepare_default_texts(self, existing_settings):
         texts = {
@@ -127,31 +146,28 @@ your machine-wide config, a mode-specific config, or both.
             "console_log": "Log level for the console log for this device.",
             "file_log": "Log level for the file log for this device.",
         }
-        # if it is already there remove it
-        for section in existing_settings:
-            if section[0] in texts:
-                del texts[section[0]]
 
         # add the remaining
         for section, text in texts.items():
-            existing_settings[(section, section + ":", 2, "Optional settings")] = text
+            if section not in existing_settings:
+                existing_settings[section] = RstSection("", text, text, 2, "Optional settings")
 
-    def create_rst(self, name, type):
-        assert type in ("device", "other")
+    def create_rst(self, name, dangerous_changes):
+        type = self.all_specs[name].get("__type__")
+
         if type == "device":
             spec = self.config_specs[name]
             device_spec = self.all_specs["device"]
-            del device_spec["valid_in"]
             spec = Util.dict_merge(spec, device_spec)
 
-            self._create_rst(name, spec, True)
+            self._create_rst(name, spec, True, dangerous_changes)
         else:
             spec = self.all_specs[name]
             if "valid_in" not in spec:
                 spec["valid_in"] = ""
-            self._create_rst(name, spec, False)
+            self._create_rst(name, spec, False, dangerous_changes)
 
-    def _create_rst(self, name, spec, device=False):
+    def _create_rst(self, name, spec, device=False, dangerous_changes=False):
 
         if name in self.existing_rsts:
             existing_intro, existing_settings = (
@@ -160,7 +176,7 @@ your machine-wide config, a mode-specific config, or both.
 
         else:
             existing_intro = ''
-            existing_settings = dict()
+            existing_settings = dict()      # type: Dict[str, RstSection]
 
         if device:
             self._prepare_default_texts(existing_settings)
@@ -198,17 +214,49 @@ your machine-wide config, a mode-specific config, or both.
                           'you...\n\n'.format(name)
             final_text += '.. todo:: :doc:`/about/help_us_to_write_it`'
 
-        final_text += '\n\n\n'
+        final_text += '\n\n.. config\n\n\n'
 
         final_text += self.build_sections(name, spec, existing_settings)
-        for setting in existing_settings:
-            if setting[1].endswith(":"):
-                print("WARNING: Removing setting {} from {}".format(setting[0], name))
 
-        self.create_file(name, final_text)
+        howtos = ""
+        if "Related How To guides" in existing_settings:
+            howtos = existing_settings["Related How To guides"].full_body
+            del existing_settings["Related How To guides"]
 
-    def build_sections(self, name, spec, existing_settings, level=1):
+        final_text += self.build_howtos(howtos)
+
+        would_remove_sections = False
+        for setting, content in existing_settings.items():
+            if content.full_body.strip():
+                would_remove_sections = True
+                print('WARNING: Removing setting "{}" from {}:\n{}\n\n-----------\n'.format(
+                    setting, name, content.full_body))
+
+        if would_remove_sections and not dangerous_changes:
+            print('WILL NOT WRITE {} because we would remove text. Add "--yes" to your commandline to process.'.format(
+                name
+            ))
+        else:
+            self.create_file(name, final_text)
+
+    def build_howtos(self, howtos):
+        final_text = "Related How To guides\n"
+        final_text += "---------------------\n\n"
+
+        if not howtos:
+            final_text += '.. todo:: :doc:`/about/help_us_to_write_it`'
+        else:
+            final_text += howtos
+
+        final_text += '\n'
+
+        return final_text
+
+    def build_sections(self, name, spec, existing_settings: Dict[str, RstSection], level=1):
         final_text = ''
+
+        existing_settings.pop("Required settings", None)
+        existing_settings.pop("Optional settings", None)
 
         if spec['required']:
             final_text += self.add_required_section(spec['required'], name,
@@ -227,8 +275,7 @@ your machine-wide config, a mode-specific config, or both.
 
         return final_text
 
-    def add_required_section(self, required_list, name, existing_settings, level):
-
+    def add_required_section(self, required_list, name, existing_settings: Dict[str, RstSection], level):
         if level == 1:
             sep = '-'
             sep2 = '~'
@@ -253,12 +300,13 @@ your machine-wide config, a mode-specific config, or both.
 
             found = False
 
-            for k1, v1 in existing_settings.items():
-                if k1[0] == setting[0] and k1[2] == level + 1:
-                    final_text += v1
+            if setting[0] in existing_settings:
+                if existing_settings[setting[0]].level == level + 1:
                     found = True
-                    del existing_settings[k1]
-                    break
+                    final_text += existing_settings[setting[0]].body
+                    del existing_settings[setting[0]]
+                else:
+                    print("WARNING: Setting {} is at the wrong level".format(setting[0]))
 
             if not found:
                 final_text += '.. todo:: :doc:`/about/help_us_to_write_it`'
@@ -295,12 +343,13 @@ your machine-wide config, a mode-specific config, or both.
 
             found = False
 
-            for k1, v1 in existing_settings.items():
-                if k1[0] == setting[0] and k1[2] == level + 1:
-                    final_text += v1
+            if setting[0] in existing_settings:
+                if existing_settings[setting[0]].level == level + 1:
                     found = True
-                    del existing_settings[k1]
-                    break
+                    final_text += existing_settings[setting[0]].body
+                    del existing_settings[setting[0]]
+                else:
+                    print("WARNING: Setting {} is at the wrong level".format(setting[0]))
 
             if not found:
                 final_text += '.. todo:: :doc:`/about/help_us_to_write_it`'
@@ -346,31 +395,39 @@ your machine-wide config, a mode-specific config, or both.
 
         return final_text
 
-    def tokenize_existing_rst(self, filename):
+    @staticmethod
+    def tokenize_existing_rst(filename) -> Tuple[str, Dict[str, RstSection]]:
         with open(filename, 'r') as f:
             doc = f.read()
 
         settings_dict = dict()
 
         # trim off the header info
-        parts = doc.split('.. overview\n\n')
+        parts = doc.split('.. overview\n\n', 1)
         if len(parts) == 2:
             doc = parts[1]
         else:
             doc = parts[0]
 
-        # split the doc into a list of lines
-        # doc = doc.split['\n']
+        parts = doc.split('.. config\n\n', 1)
+        if len(parts) == 2:
+            doc = parts[1]
+            beginning = parts[0]
+        else:
+            doc = parts[0]
+            beginning = None
 
         levels = ['=', '-', '~', '^']
         last_parents = [None, None, None, None]
         sections = list()  # tuple (name, level, parent)
+        first_section_start = None
 
-        for x in re.findall('([^\n]+)\n([~\-\^]+)', doc):
-
-            level = levels.index(x[1][0])
-            name = x[0].strip(':')
-            heading = x[0]
+        for x in re.finditer('([^\n]+)\n([~\-^]+)', doc):
+            if not first_section_start:
+                first_section_start = x.start(1)
+            level = levels.index(x.group(2)[0])
+            name = x.group(1).strip(':')
+            heading = x.group(1)
             last_parents[level] = name
 
             if level:
@@ -378,38 +435,50 @@ your machine-wide config, a mode-specific config, or both.
             else:
                 parent = None
 
-            sections.append((name, heading, level, parent))
+            sections.append((name, heading, level, parent, x.start(1), x.end(2)))
 
-        try:
-            beginning = doc[:doc.index(sections[0][1] + '\n' + ('-' * len(sections[0][1])))]
-        except (IndexError, ValueError):
-            beginning = ''
+        if not beginning:
+            if not first_section_start:
+                beginning = doc
+            else:
+                beginning = doc[:first_section_start]
 
         beginning = beginning.strip('\n')
 
-        for i, (name, heading, level, parent) in enumerate(sections):
+        for i, (name, heading, level, parent, start, start_body) in enumerate(sections):
             start = '\n' + heading + '\n' + (levels[level] * (len(heading)))
 
             try:
-                end = '\n' + sections[i+1][1] + '\n' + (levels[sections[i+1][2]] * (len(sections[i+1][1])))
+                end = sections[i+1][4]
             except IndexError:
                 end = None
 
-            try:
-                body = doc[doc.index(start):doc.index(end)].replace(start, '').strip('\n')
-            except TypeError:
-                body = doc[doc.index(start):].replace(start, '').strip('\n')
-            except ValueError:
-                print("Could not process {}. Skipping...".format(filename))
-                body = ''
+            if end:
+                try:
+                    full_body = doc[start_body:end]
+                except ValueError:
+                    raise AssertionError("Could not process section: {}".format(name))
+            else:
+                full_body = doc[start_body:]
+
+            full_body = full_body.strip('\n')
 
             # strip out the old spec string so the latest replaces it
             if level:
-                body = body.strip('\n')
-                body = '\n'.join(body.split('\n')[1:])
-                body = body.strip('\n')
+                try:
+                    header, body = full_body.split('\n\n', 1)
+                    header = header.strip('\n')
+                    body = body.strip('\n')
+                except ValueError:
+                    body = full_body
+                    header = ""
+            else:
+                header = ""
+                body = full_body
 
-            settings_dict[(name, heading, level, parent)] = body
+            if name in settings_dict and name not in ("Optional settings", "Required settings"):
+                raise AssertionError("Duplicate section {} in {}".format(name, filename))
+            settings_dict[name] = RstSection(header, body, full_body, level, parent)
 
         return beginning, settings_dict
 
@@ -448,10 +517,10 @@ your machine-wide config, a mode-specific config, or both.
             ftype = '``number`` (can be integer or floating point)'
 
         elif stype == 'bool' or stype == 'boolean' or stype == 'bool_int':
-            ftype = '``boolean`` (Yes/No or True/False)'
+            ftype = '``boolean`` (``true``/``false``)'
 
         elif stype == 'template_bool':
-            ftype = '``boolean`` or ``template`` (Yes/No or True/False; :doc:`Instructions for entering templates ' \
+            ftype = '``boolean`` or ``template`` (``true/false``; :doc:`Instructions for entering templates ' \
                     '</config/instructions/dynamic_values>`)'
 
         elif stype == 'secs':
@@ -490,64 +559,101 @@ your machine-wide config, a mode-specific config, or both.
             ftype = '``gain setting`` (-inf, db, or float between 0.0 and 1.0)'
 
         elif stype.startswith('subconfig'):
-            config = stype.replace('subconfig(', '')[:-1]
-            ftype = ':doc:`{} <{}>`'.format(config, config)
+            configs = stype.replace('subconfig(', '')[:-1].split(",")
+            try:
+                configs.remove("device")
+            except ValueError:
+                pass
+            ftype = "".join(':doc:`{} <{}>`, '.format(config, config) for config in configs)[:-2]
 
         elif stype.startswith('enum'):
             ftype = 'one of the following options: {}'.format(
                 stype.replace('enum(', '').replace(',', ', ')[:-1])
 
-        elif stype.startswith('machine'):
+        elif stype.startswith('machine('):
+            device_name = stype.replace('machine(', '')[:-1]
             ftype = "string name of a :doc:`{} <{}>` device".format(
-                    stype.replace('machine(', '')[:-1],
-                    stype.replace('machine(', '')[:-1])
+                    device_name, device_name)
+
+        elif stype.startswith('dict('):
+            stype = stype.replace('dict(', '')[:-1]
+            stype = stype.split(':')
+            ftype = 'dictionary consisting of {} : {}'.format(
+                self._get_type_desc(stype[0]), self._get_type_desc(stype[1]))
 
         elif ':' in stype:
-            raise AssertionError("Should be catched earlier.")
+            raise AssertionError("Should be catched earlier: {}.".format(stype))
 
         else:
             ftype = stype
 
         return ftype
 
+    def _layout_attribute_defaults(self, default_settings):
+        if default_settings == "None" or default_settings is None:
+            return "Defaults to empty."
+        elif default_settings == "":
+            return "Required attribute."
+        else:
+            return "Default: ``{}``".format(default_settings)
+
     def _get_spec_string(self, num, stype, default=None):
         if num == 'single':
+            if stype == 'event_posted':
+                return 'Single event. This device will be posted by the device. {}\n'.format(
+                    self._layout_attribute_defaults(default))
+            elif stype == 'event_handler':
+                return 'Single event. The device will add an handler for this event. {}\n'.format(
+                    self._layout_attribute_defaults(default))
+
             return_string = 'Single value, '
         elif num == 'list' or num == 'set':
+            if stype == 'event_posted':
+                return 'List of one (or more) events. Those will be posted by the device. {}\n'.format(
+                    self._layout_attribute_defaults(default))
+            elif stype == 'event_handler':
+                return 'List of one (or more) events. The device will add handlers for those events. {}\n'.format(
+                    self._layout_attribute_defaults(default))
+
             return_string = 'List of one (or more) values, each is a '
         elif num == 'dict':
-            stype = tuple(stype.split(':'))
-            return_string = 'One or more sub-entries, each in the format of {} : {}'.format(
+            stype = stype.split(':')
+            return_string = 'One or more sub-entries. Each in the format of {} : {}\n'.format(
                 self._get_type_desc(stype[0]), self._get_type_desc(stype[1]))
             return return_string
         elif num == 'omap':
-            return_string = ('Ordered list for one (or more) sub-settings. '
-                             'Each sub-setting is a ')
-        elif num == 'event_handler':
-            return_string = 'List of one (or more) device control events (:doc:`Instructions for entering '\
-                    'device control events </config/instructions/device_control_events>`).'
-            if default is not None and default != "None":
-                return_string += " Default: " + default
-            return_string += '\n'
+            stype = stype.split(':')
+            return_string = 'Ordered list for one (or more) sub-settings. Each in the format of {} : {}\n'.format(
+                self._get_type_desc(stype[0]), self._get_type_desc(stype[1]))
             return return_string
+        elif num == 'event_handler':
+            return 'List of one (or more) device control events (:doc:`Instructions for entering '\
+                    'device control events </config/instructions/device_control_events>`). {}\n'.format(
+                self._layout_attribute_defaults(default))
 
+        elif num == "ignored":
+            return "Unknown type. See description below.\n"
         else:
             raise AssertionError("Invalid config spec num: {}".format(num))
 
         ftype = self._get_type_desc(stype)
 
-        return_string += 'type: {}.'.format(ftype)
-
-        if default is not None and default != "None":
-            return_string += ' Default: ``{}``'.format(default)
-
-        return_string += '\n'
+        return_string += 'type: {}. {}\n'.format(ftype, self._layout_attribute_defaults(default))
 
         return return_string
 
 
 if __name__ == '__main__':
     parser = ConfigDocParser()
-    parser.create_rst(sys.argv[1], sys.argv[2])
+
+    if len(sys.argv) <= 1:
+        print("Usage: {} config_section_name/all".format(sys.argv[0]))
+
+    dangerous_changes = sys.argv[2] == "--yes" if len(sys.argv) > 2 else False
+
+    if sys.argv[1] == "all":
+        parser.create_rsts(dangerous_changes)
+    else:
+        parser.create_rst(sys.argv[1], dangerous_changes)
     #parser.create_rsts()
     #parser.write_index()

@@ -47,6 +47,7 @@ Hardware
 ~~~~~~~~
 
 There are two common types of serial LEDs: WS281x and LPD880x.
+(See :doc:`ws2812` for more details about WS2811/WS2812 in pinball.)
 Those LEDs are chained which means that the controller only connects to the
 first LED.
 The first LED will connect to the second.
@@ -78,7 +79,7 @@ You can define serial LEDS in MPF as :doc:`/config/lights`:
   lights:
     my_ws2811:
       number: 0         # first LED in chain (with three channels)
-      type: rgb         # redundant
+      type: rgb
     my_ws2812:
       number: 1         # second LED in chain (with three channels)
       type: grb
@@ -142,6 +143,24 @@ The RGBW shifts all the channels by one internally. As you can see this can
 quickly become confusing so it might be wise to run RGBW LEDs (or any
 non-three-channel LEDs) as a separate chain.
 
+Starting with MPF 0.54 there is a new syntax to chain lights:
+
+.. code-block:: mpf-config
+
+    lights:
+      led_0:
+        start_channel: 0-0    # the exact number format depends on your platform
+        subtype: led
+        type: rgb    # will use red: 0-0, green: 0-1, blue: 0-2
+      led_1:
+        previous: led_0
+        subtype: led
+        type: rgbw   # will use red: 0-3, green: 0-4, blue: 0-5, white: 0-6
+      led_2:
+        previous: led_1
+        subtype: led
+        type: rgbw   # will use red: 0-7, green: 0-8, blue: 0-9, white: 0-10
+
 Parallel LEDs
 -------------
 
@@ -184,6 +203,23 @@ You can also have multiple channels per color (if you do not want to make them d
           - number: 6
           - number: 7
 
+With parallel LED you can also use ``start_channel`` to define the color
+(starting from MPF 0.54):
+
+.. code-block:: mpf-config
+
+    lights:
+      my_red_only_insert:
+        start_channel: 0    # the exact number format depends on your platform
+        type: r    # will use red: 0
+      my_rgb_insert:
+        start_channel: 1    # the exact number format depends on your platform
+        type: rbg   # will use red: 1, green: 3, blue: 2
+      my_white_light:
+        previous: my_rgb_insert     # you can also chain those if you want
+        type: w   # will use white: 4
+
+
 Serial vs Parallel LEDs
 -----------------------
 
@@ -211,6 +247,33 @@ At least test extensively.
 However, you might take some risks in a homebrew machine because serial LEDs
 are quite cheap and easy to replace once broken.
 In practise they seem to work just fine for all homebrew machines we know.
+
+Can I used RGB LEDs below colored inserts?
+------------------------------------------
+
+There is no point to use RGB LEDs below colored inserts.
+That simply does not work physically.
+Those colored inserts act as filter and any other color simply shall not pass.
+
+We recommend white LEDs below colored inserts.
+Then define them as red or whatever color your insert is.
+If you use parallel LEDs below colored inserts just buy plain white ones.
+For serial LEDs you can buy bulk WS2811 PCBs from china and connect white LEDs
+to any of the channels.
+
+Which LED Types Are Supported in MPF?
+-------------------------------------
+
+MPF supports any white, single-color or multi-color LED.
+This includes RGB, RGBW or any other combination you can imagine.
+The ``type`` parameter just reads the channels and maps them without thinking
+too much of it.
+For instance you can use GRBW LEDs with a green, red, blue and white channel.
+Similarly, RRBRGWBGWWR or even more crazy combinations work fine.
+
+Currently, MPF support red, blue, gree and white channels.
+White it calculated as the minimum brightness of all channels.
+If you need other channels such as orange let us know in the forum.
 
 Color Correction
 ----------------

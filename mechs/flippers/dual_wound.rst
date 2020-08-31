@@ -1,6 +1,8 @@
 How to configure dual-wound flippers
 ====================================
 
+.. include:: /hardware/voltages_and_power/common_ground_warning.rst
+
 This guide shows you how to configure dual-wound flippers in MPF. If you don't
 know what "dual-wound" flippers are, or whether you have them, take a look at
 the coil that your flipper uses. If it has three wires (or three tabs to
@@ -10,6 +12,12 @@ If it has two wires (or two tabs), then read the :doc:`single_wound` guide.
 
 Read more about "dual wound" versus "single wound" coils in the
 :doc:`/mechs/coils/dual_vs_single_wound` guide.
+
+See :doc:`coil hardware </mechs/coils/index>` for more details about the
+current, resistance, number of windings and the strength of coils.
+See :doc:`dual-wound hardware </mechs/coils/dual_wound_coils>` for details
+about how to find out which terminals on your coils are hold, which are the
+main coil and how to connect them.
 
 1. Add your flipper buttons
 ---------------------------
@@ -212,3 +220,9 @@ we created in this How To guide:
    :caption: `/config/config.yaml </mpf_examples/flippers/config/hold_no_eos.yaml>`_
    :language: yaml
    :emphasize-lines: 4-5,9,11,15,18,21,24
+
+Related How To guides
+---------------------
+
+* :doc:`/mechs/coils/dual_wound_coils`
+* :doc:`/mechs/coils/dual_vs_single_wound`

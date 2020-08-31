@@ -21,10 +21,31 @@ on a display. This is great for fine tuning and tweaking your slides.
 The MPF service cli is a fast way to debug or troubleshoot your machine during
 development and operation.
 
+:doc:`Build Production Configs <build/index>`
+---------------------------------------------
+
+A command to prepare production config bundles.
+
 :doc:`Lightshow Creator <showcreator/index>`
 --------------------------------------------
 
 A lightshow generator for MPF.
+
+:doc:`Language Server in Your IDE <language_server/index>`
+----------------------------------------------------------
+
+IDE support for your editor to support auto-complete for MPF configs.
+
+:doc:`MPF format <format/index>`
+--------------------------------
+
+Reformat your MPF config files.
+
+:doc:`MPF test <test/index>`
+--------------------------------
+
+Run single file tests to reproduce problems or verify behaviour.
+
 
 Machine Fuzzer
 --------------
@@ -59,3 +80,7 @@ Future Tools
    imc/index
    service_cli/index
    showcreator/index
+   IDE Support <language_server/index>
+   build/index
+   format/index
+   test/index

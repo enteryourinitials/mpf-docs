@@ -46,6 +46,9 @@ you add a ``rgb_dmds:`` section to your config, then under that you
 add an entry for a specific DMD (which can be whatever you want), and then
 you enter one or more of the following settings:
 
+.. config
+
+
 Optional settings
 -----------------
 
@@ -95,7 +98,7 @@ want to adjust both of them together.
 
 hardware_brightness:
 ~~~~~~~~~~~~~~~~~~~~
-Single value, type: template_float. Default: ``1.0``
+Single value, type: ``number`` or ``template`` (will be converted to floating point; :doc:`Instructions for entering templates </config/instructions/dynamic_values>`). Default: ``1.0``
 
 A brightness multiplier for the DMD (because RGB DMDs are crazy bright).
 Note that brightness is closely related to gamma (see above). You'll probably
@@ -105,13 +108,13 @@ want to adjust both of them together.
 
 only_send_changes:
 ~~~~~~~~~~~~~~~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
 
 Specifies whether every frame is sent to the DMD, or only changed frames.
 
 platform:
 ~~~~~~~~~
-Single value, type: ``string``.
+Single value, type: ``string``. Defaults to empty.
 
 Name of the platform this DMD is connected to. The default value of ``None`` means the
 default hardware platform will be used. You only need to change this if you have
@@ -136,7 +139,7 @@ Log level for the console log for this device.
 
 debug:
 ~~~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
 
 Set this to true to see additional debug output. This might impact the performance of MPF.
 
@@ -154,7 +157,13 @@ Name of this device in service mode.
 
 tags:
 ~~~~~
-List of one (or more) values, each is a type: ``string``.
+List of one (or more) values, each is a type: ``string``. Defaults to empty.
 
 Not used currently.
 
+
+Related How To guides
+---------------------
+
+* :doc:`/hardware/dmd_platforms`
+* :doc:`/displays/display/rgb_dmd`

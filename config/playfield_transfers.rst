@@ -38,6 +38,9 @@ This is an example:
        label: Playfield 2
        default_source_device: None
 
+.. config
+
+
 Required settings
 -----------------
 
@@ -45,15 +48,16 @@ The following sections are required in the ``playfield_transfers:`` section of y
 
 captures_from:
 ~~~~~~~~~~~~~~
-Single value, type: string name of a ``playfields:`` device.
+Single value, type: string name of a :doc:`ball_devices <ball_devices>` device. Defaults to empty.
 
 Source playfield for the transfer.
 
 eject_target:
 ~~~~~~~~~~~~~
-Single value, type: string name of a ``playfields:`` device.
+Single value, type: string name of a :doc:`ball_devices <ball_devices>` device. Defaults to empty.
 
 Target playfield for the transfer.
+
 
 Optional settings
 -----------------
@@ -62,16 +66,35 @@ The following sections are optional in the ``playfield_transfers:`` section of y
 
 ball_switch:
 ~~~~~~~~~~~~
-
-Single value, type: string name of a ``switches:`` device. Default: ``None``
+Single value, type: string name of a :doc:`switches <switches>` device. Defaults to empty.
 
 Ball switch which triggers the transfer.
 
+transfer_events:
+~~~~~~~~~~~~~~~~
+List of one (or more) device control events (:doc:`Instructions for entering device control events </config/instructions/device_control_events>`). Defaults to empty.
+
+Default: ``None``
+
+Events in this list, when posted, will trigger a ball transfer.
+
+console_log:
+~~~~~~~~~~~~
+Single value, type: one of the following options: none, basic, full. Default: ``basic``
+
+Log level for the console log for this device.
+
 debug:
 ~~~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
 
 Set this to true to see more debug output.
+
+file_log:
+~~~~~~~~~
+Single value, type: one of the following options: none, basic, full. Default: ``basic``
+
+Log level for the file log for this device.
 
 label:
 ~~~~~~
@@ -81,17 +104,12 @@ Name in service mode.
 
 tags:
 ~~~~~
-List of one (or more) values, each is a type: ``string``. Default: ``None``
+List of one (or more) values, each is a type: ``string``. Defaults to empty.
 
 Tags of the device. Not used currently.
 
-transfer_events:
-~~~~~~~~~~~~~~~~
-One or more sub-entries, either as a list of events, or key/value pairs of
-event names and delay times. (See the
-:doc:`/config/instructions/device_control_events` documentation for details
-on how to enter settings here.
 
-Default: ``None``
+Related How To guides
+---------------------
 
-Events in this list, when posted, will trigger a ball transfer.
+* :doc:`/mechs/playfields/index`

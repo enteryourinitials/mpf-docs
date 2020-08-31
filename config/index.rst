@@ -40,14 +40,18 @@ indicated which type of config file it's valid in.
    ball_locks: <ball_locks>
    ball_saves: <ball_saves>
    bcp: <bcp>
+   bcp_connection: <bcp_connection>
+   bcp_server: <bcp_server>
    bitmap_fonts: <bitmap_fonts>
    bonus (mode_settings:) <bonus>
    coil_overwrites: <coil_overwrites>
    coil_player: <coil_player>
    coils: <coils>
+   color_correction_profile: <color_correction_profile>
    combo_switches: <combo_switches>
    config: <config>
    counters: <counters>
+   counter_control_events: <counter_control_events>
    credits: <credits>
    custom_code: <custom_code>
    display_light_player: <display_light_player>
@@ -64,6 +68,7 @@ indicated which type of config file it's valid in.
    fadecandy: <fadecandy>
    fast: <fast>
    fast_coils: <fast_coils>
+   fast_firmware_update: <fast_firmware_update>
    fast_switches: <fast_switches>
    flasher_player: <flasher_player>
    flashers: <flashers>
@@ -87,6 +92,7 @@ indicated which type of config file it's valid in.
    lisy: <lisy>
    leds: <leds>
    lights: <lights>
+   light_segment_displays: <light_segment_displays>
    light_settings: <light_settings>
    light_player: <light_player>
    logic_blocks: <logic_blocks>
@@ -95,6 +101,8 @@ indicated which type of config file it's valid in.
    machine_vars: <machine_vars>
    magnets: <magnets>
    matrix_lights: <matrix_lights>
+   mc_custom_code: <mc_custom_code>
+   mc_scriptlets: <mc_scriptlets>
    mode: <mode>
    mode_settings: <mode_settings>
    modes: <modes>
@@ -108,6 +116,7 @@ indicated which type of config file it's valid in.
    open_pixel_control: <open_pixel_control>
    opp: <opp>
    opp_coils: <opp_coils>
+   osc: <osc>
    p_roc: <p_roc>
    pd_led_boards <pd_led_boards>
    pin2dmd: <pin2dmd>
@@ -118,6 +127,7 @@ indicated which type of config file it's valid in.
    playlists: <playlists>
    plugins: <plugins>
    pololu_maestro: <pololu_maestro>
+   pololu_tic: <pololu_tic>
    psus: <psus>
    queue_event_player: <queue_event_player>
    queue_relay_player: <queue_relay_player>
@@ -148,14 +158,18 @@ indicated which type of config file it's valid in.
    smart_virtual: <smart_virtual>
    smartmatrix: <smartmatrix>
    snux: <snux>
+   sound_ducking: <sound_ducking>
    sound_loop_player: <sound_loop_player>
    sound_loop_sets: <sound_loop_sets>
+   sound_marker: <sound_marker>
    sound_player: <sound_player>
    sound_pools: <sound_pools>
+   sound_system_tracks: <sound_system_tracks>
    sound_system: <sound_system>
    sounds: <sounds>
    spi_bit_bang <spi_bit_bang>
    spike: <spike>
+   spike_node: <spike_node>
    state_machines: <state_machines>
    steppers: <steppers>
    step_stick_stepper_settings: <step_stick_stepper_settings>
@@ -165,6 +179,7 @@ indicated which type of config file it's valid in.
    system11: <system11>
    text_strings: <text_strings>
    text_ui: <text_ui>
+   tic_stepper_settings: <tic_stepper_settings>
    tilt: <tilt>
    timed_switches: <timed_switches>
    timers: <timers>

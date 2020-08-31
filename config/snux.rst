@@ -22,13 +22,12 @@ This is an example:
      platform: virtual    # use your platform here
      driverboards: wpc
      coils: snux
+     switches: snux
    system11:
      ac_relay_delay_ms: 75
      ac_relay_driver: c_ac_relay
    snux:
-     flipper_enable_driver: c_flipper_enable_driver
      diag_led_driver: c_diag_led_driver
-     platform: virtual    # use your platform here
    coils:
      c_diag_led_driver:
        number: c24
@@ -49,6 +48,26 @@ This is an example:
      c_side_c2:
        number: c12c
        default_hold_power: 0.5
+     c_flipper_left_main:
+       number: FLLM
+     c_flipper_left_hold:
+       number: FLLH
+       allow_enable: true
+
+   switches:
+     s_flipper_left:
+       number: sf01
+     s_test:
+       number: s77
+
+   flippers:
+     f_test_single:
+       main_coil: c_flipper_left_main
+       hold_coil: c_flipper_left_hold
+       activation_switch: s_flipper_left
+
+.. config
+
 
 Required settings
 -----------------
@@ -57,37 +76,32 @@ The following sections are required in the ``snux:`` section of your config:
 
 diag_led_driver:
 ~~~~~~~~~~~~~~~~
-Single value, type: string name of a ``coils:`` device.
+Single value, type: string name of a :doc:`coils <coils>` device. Defaults to empty.
 
 The coil to use to drive the diag LED on the snux board.
+This is usually driver 23 on the Snux board.
 
-flipper_enable_driver:
-~~~~~~~~~~~~~~~~~~~~~~
-Single value, type: string name of a ``coils:`` device.
-
-System 11 does not support any rules in software since the CPUs were too slow
-at that time. Instead, they use a relay to enable flippers, pop bumpers and
-slingshots.
-Configure the driver to use to enable the flipper enable relay.
 
 Optional settings
 -----------------
 
 The following sections are optional in the ``snux:`` section of your config. (If you don't include them, the default will be used).
 
-prefer_a_side_event:
-~~~~~~~~~~~~~~~~~~~~
-Single value.  The name of an event that will make the AC relay sit on the 'A' side when at rest.  Default: ``game_ended``
-Generally when the game is idle, the AC relay should be de-energised, so it sits on the 'A' side.
+console_log:
+~~~~~~~~~~~~
+Single value, type: one of the following options: none, basic, full. Default: ``none``
 
-prefer_c_side_event:
-~~~~~~~~~~~~~~~~~~~~
-Single value.  The name of an event that will make the AC relay sit on the 'C' side when at rest.  Default: ``game_starting``
-Generally when the game is in play, the AC relay should be energised, favouring the 'C' side which generally handles the flashers.  This means they respond quickly without the need to wait on the relay being energised.
+Log level for the console log for this platform.
 
-platform:
+file_log:
 ~~~~~~~~~
-Single value, type: ``string``. Default: ``None``
+Single value, type: one of the following options: none, basic, full. Default: ``basic``
+
+Log level for the file log for this platform.
+
+
+Related How To guides
+---------------------
 
 :doc:`WPC Platform </hardware/existing_machines/wpc>` to connect to the
 :doc:`SNUX board </hardware/snux/index>`.

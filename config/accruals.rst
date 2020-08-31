@@ -11,14 +11,6 @@ accruals:
 
 .. overview
 
-+------------------------------------------------------------------------------+
-| Related Tutorial                                                             |
-+==============================================================================+
-| :doc:`/game_logic/logic_blocks/integrating_logic_blocks_and_shows`           |
-+------------------------------------------------------------------------------+
-
-See also :doc:`accruals </game_logic/logic_blocks/accruals>`.
-
 The structure of accrual logic blocks are like this:
 
 .. code-block:: yaml
@@ -34,6 +26,8 @@ The structure of accrual logic blocks are like this:
 Note that the actual name of the logic block doesn't really matter. Mainly
 they're used in the logs.
 
+.. config
+
 
 Required settings
 -----------------
@@ -42,7 +36,7 @@ The following sections are required in the ``accruals:`` section of your config:
 
 events:
 ~~~~~~~
-List of one (or more) values, each is a type: ``string``.
+List of one (or more) events. The device will add handlers for those events. Defaults to empty.
 
 The events section of an accrual logic block is where you define the
 events this logic block will watch for in order to make progress towards
@@ -113,6 +107,7 @@ those two logic blocks, if the events were posted in the order event2, event3, e
 then event5, that would complete logic block 2. Then later if event1 was posted, that
 would complete logic block 1.
 
+
 Optional settings
 -----------------
 
@@ -126,7 +121,7 @@ Log level for the console log for this device.
 
 debug:
 ~~~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
 
 Set this to true to see additional debug output. This might impact the performance of MPF.
 
@@ -144,11 +139,16 @@ Name of this device in service mode.
 
 tags:
 ~~~~~
-List of one (or more) values, each is a type: ``string``.
+List of one (or more) values, each is a type: ``string``. Defaults to empty.
 
 Currently unused.
 
 
-.. include:: /game_logic/logic_blocks/player_variable.rst
+.. include:: /config/logic_blocks_common.rst
 
-.. include:: /game_logic/logic_blocks/common.rst
+
+Related How To guides
+---------------------
+
+* :doc:`/game_logic/logic_blocks/accruals`
+* :doc:`/game_logic/logic_blocks/integrating_logic_blocks_and_shows`

@@ -15,13 +15,13 @@ tutorial we'll just call this button ``s_start`` and add it like this:
 
    switches:
      s_start:
-       number: 10
+       number: 11
 
 2. Add a "start" tag to your Start button
 -----------------------------------------
 
 Just like the special-purpose tags we used when configuring the ball
-devices, MPF uses some special purpose tags for switches, too. One of
+devices, MPF uses some :doc:`special purpose tags for switches </config/switches>`, too. One of
 them is ``start``, as MPF watches for switches tagged with "start" to
 start games and add players to running games.
 
@@ -38,7 +38,7 @@ want act as the start button. So now your start switch in your
 
    switches:
      s_start:
-       number: 10
+       number: 11
        tags: start
 
 3. Add keyboard entries for your start switch
@@ -88,6 +88,9 @@ playfield switches, for example:
        number: 12
        tags: playfield_active
 
+Note: The tags playfield_active and above the start tag are :doc:`special 
+purpose tags for switches </config/switches>`.
+
 While you're at it, create a keyboard key mapping for this switch in
 the ``keyboard:`` section of your config, like this:
 
@@ -119,11 +122,11 @@ But then we're ready to play a real game!
 Check out the complete config.yaml file so far
 ----------------------------------------------
 
-If you want to see a complete ``config.yaml`` file up to this point, it's in the ``mpf-examples/tutorial``
-folder with the name ``step9.yaml``.
+If you want to see a complete ``config.yaml`` file up to this point, it's in the ``mpf-examples/tutorial/step_9``
+folder.
 
 You can run this file directly by switching to that folder and then running the following command:
 
 .. code-block:: doscon
 
-   C:\mpf-examples\tutorial>mpf both -c step9
+   C:\mpf-examples\tutorial>mpf both

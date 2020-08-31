@@ -118,7 +118,7 @@ Flashers
 Solenoids
 ^^^^^^^^^
 
-- add all normal solenoids to the ``Sub InitSolenoids``, to initialize them als ``False``
+- add all normal solenoids to the ``Sub InitSolenoids``, to initialize them as ``False``
 - in ``Sub UpdateSolenoids`` add a case for every MPF coil number, setting the state of the VPX solenoid. Use "" to include string type numbers
 
 Flippers
@@ -133,3 +133,8 @@ To run a game
 3. start VPX table
 
 To exit a game shut down the VPX table first
+
+What if it did not work?
+------------------------
+
+Have a look at our :doc:`hardware troubleshooting guide </hardware/troubleshooting_hardware>`.

@@ -13,6 +13,8 @@ pin2dmd:
 
 The ``pin2dmd:`` section of your config is where you configure your :doc:`PIN2DMD RGB DMD display </hardware/pin2dmd/index>`.
 
+.. config
+
 
 Optional settings
 -----------------
@@ -27,7 +29,7 @@ Log level for the console log for this device.
 
 debug:
 ~~~~~~
-Single value, type: ``boolean`` (Yes/No or True/False). Default: ``False``
+Single value, type: ``boolean`` (``true``/``false``). Default: ``false``
 
 Set this to true to see additional debug output. This might impact the performance of MPF.
 
@@ -52,3 +54,7 @@ The resolution of your panel.
 PIN2DMD XL is ``192x64`` and the standard PIN2DMD is ``128x32``.
 
 
+Related How To guides
+---------------------
+
+* :doc:`/hardware/pin2dmd/index`

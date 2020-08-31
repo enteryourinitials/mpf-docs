@@ -79,7 +79,7 @@ first step to doing that is to figure out what the port names are on your
 system:
 
 Finding the COM ports on Windows
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 On Windows, it's easiest to use the Device Manager. Right-click on the Start
 button (or whatever it's called now) and choose "Device Manager" from the
@@ -94,7 +94,7 @@ The port names will start with "COM" and then be a number, and there will be
 four consecutive numbers to represent the four FAST ports.
 
 Finding the COM ports on Max or Linux
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 On Mac or Linux, it's easiest to find the port numbers via the terminal window
 (or console window). To do that, open a new window and run the following
@@ -206,3 +206,8 @@ The ``watchdog:`` setting is the timeout in milliseconds. Use 0 to disable it.
 Note that at this time, FAST Pinball controllers only use the watch dog for
 the NET processor (which controls stuff on the IO boards, like coils). The
 watch dog is not used for the DMD or LEDs.
+
+What if it did not work?
+------------------------
+
+Have a look at our :doc:`FAST troubleshooting guide <troubleshooting>`.
